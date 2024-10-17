@@ -3,47 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key Management</title>
+    <title>Key Management - API Key Management System</title>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --header-color: #2c3e50;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            margin: 0;
         }
         .container {
             background-color: white;
-            padding: 20px;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             width: 80%;
             max-width: 800px;
         }
         h1 {
             margin-top: 0;
             text-align: center;
+            color: var(--primary-color);
         }
         form {
             display: flex;
             flex-direction: column;
             margin-bottom: 20px;
         }
-        label, input {
-            margin-bottom: 10px;
+        label {
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         button {
             padding: 10px;
-            background-color: #007BFF;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
             align-self: center;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: var(--secondary-color);
         }
         table {
             width: 100%;
@@ -58,7 +76,11 @@
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: var(--header-color);
+            color: white;
+        }
+        .logout-button {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -82,7 +104,7 @@
             </thead>
             <tbody id="api-keys"></tbody>
         </table>
-        <button onclick="logout()">Logout</button>
+        <button onclick="logout()" class="logout-button">Logout</button>
     </div>
 
     <script>
