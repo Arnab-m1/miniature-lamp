@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+        }
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        label, input {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            align-self: center;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Key Management</h1>
+        <form id="generate-api-key-form">
+            <label for="name">Key Name:</label>
+            <input type="text" id="name" name="name" required>
+            <button type="submit">Generate API Key</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Key</th>
+                    <th>Created At</th>
+                    <th>Last Used</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="api-keys"></tbody>
+        </table>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        async function generateApiKey(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const response = await fetch('/api-keys', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            });
+            const data = await response.json();
+            loadApiKeys();
+        }
+
+        async function loadApiKeys() {
+            const response = await fetch('/api-keys', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const apiKeys = await response.json();
+            const apiKeysList = document.getElementById('api-keys');
+            apiKeysList.innerHTML = '';
+            apiKeys.forEach(apiKey => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${apiKey.name}</td>
+                    <td>${apiKey.key}</td>
+                    <td>${new Date(apiKey.createdAt).toLocaleString()}</td>
+                    <td>${apiKey.lastUsed ? new Date(apiKey.lastUsed).toLocaleString() : 'Never'}</td>
+                    <td><button onclick="deleteApiKey('${apiKey._id}')">Delete</button></td>
+                `;
+                apiKeysList.appendChild(row);
+            });
+        }
+
+        async function deleteApiKey(id) {
+            await fetch(`/api-keys/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            loadApiKeys();
+        }
+
+        function logout() {
+            fetch('/logout', {
+                method: 'GET'
+            }).then(() => {
+                localStorage.removeItem('token');
+                window.location.href = '/signin';
+            });
+        }
+
+        document.getElementById('generate-api-key-form').addEventListener('submit', generateApiKey);
+        document.addEventListener('DOMContentLoaded', loadApiKeys);
+    </script>
+</body>
+</html>
